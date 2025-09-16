@@ -1,4 +1,3 @@
-// MensClothing.tsx
 import React from "react";
 
 interface MensClothingProps {
@@ -15,7 +14,6 @@ const MensClothing: React.FC<MensClothingProps> = ({ selectedCategory }) => {
         <div className="w-20 h-1 bg-yellow-400 mb-8"></div>
       </div>
 
-      {/* Subcategories */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
         {subcategories.map((sub, index) => (
           <div

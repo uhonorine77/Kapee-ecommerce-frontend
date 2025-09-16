@@ -1,4 +1,3 @@
-// Footer.tsx
 import React from "react";
 import {
   FaFacebookF,
@@ -11,7 +10,6 @@ import {
 } from "react-icons/fa";
 import { MdHome, MdPhone, MdEmail, MdAccessTime } from "react-icons/md";
 
-// Import payment card images from assets
 import visaImg from "../assets/Visa.png";
 import paypalImg from "../assets/Paypal.png";
 import discoverImg from "../assets/Discover.png";
