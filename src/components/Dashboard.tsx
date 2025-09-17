@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { DollarSign, ShoppingCart, Users, Activity, ChevronUp, ChevronDown, Bell, Search, LogOut, ChevronRight, LayoutDashboard } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import head from '../assets/head.jpeg';
 import xbox from '../assets/xbox.jpg';
 import applewatch from '../assets/applewatch.jpeg';
 import { useAuth } from '../AuthContext';
 import { useNavigate } from 'react-router-dom';
 import MensClothing from './MensClothing';
-
-// --- Reusable Child Components ---
 
 const StatCard: React.FC<any> = ({ title, value, icon, trend, trendDirection, color }) => (
   <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
@@ -37,9 +36,7 @@ const DashboardUpperBar: React.FC<{ selectedView: string }> = ({ selectedView })
 
   return (
     <div className="flex items-center justify-between p-4 bg-white shadow-md rounded-lg mb-6">
-      <div className="flex items-center">
-        <h1 className="text-2xl font-bold text-gray-800 capitalize">{selectedView}</h1>
-      </div>
+      <div className="flex items-center"><h1 className="text-2xl font-bold text-gray-800 capitalize">{selectedView}</h1></div>
       <div className="flex items-center space-x-4">
         <div className="relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} /><input type="text" placeholder="Search..." className="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
         <button className="p-2 rounded-full hover:bg-gray-100"><Bell size={20} /></button>
@@ -50,6 +47,34 @@ const DashboardUpperBar: React.FC<{ selectedView: string }> = ({ selectedView })
     </div>
   );
 };
+
+// --- NEW: Sales Chart Component ---
+const salesData = [
+  { name: 'Jan', sales: 4000, profit: 2400 },
+  { name: 'Feb', sales: 3000, profit: 1398 },
+  { name: 'Mar', sales: 5000, profit: 9800 },
+  { name: 'Apr', sales: 4780, profit: 3908 },
+  { name: 'May', sales: 5890, profit: 4800 },
+  { name: 'Jun', sales: 4390, profit: 3800 },
+  { name: 'Jul', sales: 5490, profit: 4300 },
+];
+
+const SalesChart: React.FC = () => {
+  return (
+    <ResponsiveContainer width="100%" height="100%">
+      <LineChart data={salesData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="name" />
+        <YAxis />
+        <Tooltip />
+        <Legend />
+        <Line type="monotone" dataKey="sales" stroke="#3b82f6" strokeWidth={2} activeDot={{ r: 8 }} />
+        <Line type="monotone" dataKey="profit" stroke="#84cc16" strokeWidth={2} />
+      </LineChart>
+    </ResponsiveContainer>
+  );
+};
+
 
 // --- Main Dashboard View (Stats, Charts, etc.) ---
 const MainDashboardView: React.FC = () => {
@@ -74,7 +99,13 @@ const MainDashboardView: React.FC = () => {
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2 space-y-8">
-                    <div className="bg-white p-6 rounded-lg shadow-md"><h2 className="text-xl font-semibold text-gray-800 mb-4">Sales Overview</h2><div className="h-80 bg-gray-100 rounded-lg flex items-center justify-center"><p className="text-gray-500">Sales chart will be displayed here.</p></div></div>
+                    <div className="bg-white p-6 rounded-lg shadow-md">
+                        <h2 className="text-xl font-semibold text-gray-800 mb-4">Sales Overview</h2>
+                        <div className="h-80">
+                            {/* UPDATED: Chart is now rendered here */}
+                            <SalesChart />
+                        </div>
+                    </div>
                     <div className="bg-white p-6 rounded-lg shadow-md"><h2 className="text-xl font-semibold text-gray-800 mb-4">Recent Orders</h2><div className="overflow-x-auto"><table className="w-full text-sm text-left text-gray-500"><thead className="text-xs text-gray-700 uppercase bg-gray-50"><tr><th scope="col" className="px-6 py-3">Order ID</th><th scope="col" className="px-6 py-3">Customer</th><th scope="col" className="px-6 py-3">Date</th><th scope="col" className="px-6 py-3">Total</th><th scope="col" className="px-6 py-3">Status</th></tr></thead><tbody>{recentOrders.map((order) => (<tr key={order.id} className="bg-white border-b hover:bg-gray-50"><td className="px-6 py-4 font-medium text-gray-900">{order.id}</td><td className="px-6 py-4">{order.customer}</td><td className="px-6 py-4">{order.date}</td><td className="px-6 py-4">{order.total}</td><td className="px-6 py-4"><span className={`px-2 py-1 rounded-full text-xs font-medium ${order.statusColor}`}>{order.status}</span></td></tr>))}</tbody></table></div></div>
                 </div>
                 <div className="bg-white p-6 rounded-lg shadow-md"><h2 className="text-xl font-semibold text-gray-800 mb-4">Top Selling Products</h2><div className="space-y-4">{topProducts.map((product, index) => (<div key={index} className="flex items-center space-x-4"><img src={product.image} alt={product.name} className="w-16 h-16 object-cover rounded-lg" /><div className="flex-1"><p className="font-medium text-gray-800">{product.name}</p><p className="text-sm text-gray-500">{product.sales} sales</p></div></div>))}</div></div>
@@ -87,9 +118,7 @@ const MainDashboardView: React.FC = () => {
 // --- The Main Dashboard Component ---
 
 const Dashboard: React.FC = () => {
-  // State to manage which view is active (e.g., 'dashboard', 'men's clothing')
   const [activeView, setActiveView] = useState<string>('dashboard');
-  // State to manage which sidebar category is expanded
   const [expandedCategory, setExpandedCategory] = useState<string>('');
 
   const sidebarNavItems = [
@@ -101,20 +130,14 @@ const Dashboard: React.FC = () => {
   ];
 
   const handleNavClick = (viewName: string) => {
-    setActiveView(viewName.toLowerCase()); // Set the active view for rendering content
-    setExpandedCategory(prev => prev === viewName ? '' : viewName); // Toggle expansion
+    setActiveView(viewName.toLowerCase());
+    setExpandedCategory(prev => prev === viewName ? '' : viewName);
   };
 
-  // Function to conditionally render the main content based on the active view
   const renderContent = () => {
     switch (activeView) {
-      case 'dashboard':
-        return <MainDashboardView />;
-      case "men's clothing":
-        return <MensClothing selectedCategory="Men's Clothing" />;
-      // Add cases for other components here
-      // case 'women\'s clothing':
-      //   return <WomensClothingComponent />;
+      case 'dashboard': return <MainDashboardView />;
+      case "men's clothing": return <MensClothing selectedCategory="Men's Clothing" />;
       default:
         return (
           <div className="bg-white p-8 rounded-lg shadow-md text-center">
@@ -127,11 +150,9 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 flex">
-      {/* Sidebar Navigation */}
       <aside className="w-64 bg-white shadow-lg flex flex-col">
         <div className="p-6 text-2xl font-bold text-gray-800 border-b">kapee. Admin</div>
         <nav className="flex-1 p-4 space-y-2">
-          {/* Dashboard Home Button */}
           <button
             onClick={() => handleNavClick('dashboard')}
             className={`w-full flex items-center p-3 rounded-lg text-left transition-colors ${activeView === 'dashboard' ? 'bg-blue-500 text-white' : 'hover:bg-gray-100'}`}
@@ -139,7 +160,6 @@ const Dashboard: React.FC = () => {
             <LayoutDashboard size={20} className="mr-3" />
             <span className="font-medium">Dashboard</span>
           </button>
-          
           <div className="pt-2 mt-2 border-t">
             {sidebarNavItems.map((item) => (
               <div key={item.name}>
@@ -162,8 +182,6 @@ const Dashboard: React.FC = () => {
           </div>
         </nav>
       </aside>
-
-      {/* Main Content Area */}
       <main className="flex-1 p-8">
         <DashboardUpperBar selectedView={activeView} />
         {renderContent()}
