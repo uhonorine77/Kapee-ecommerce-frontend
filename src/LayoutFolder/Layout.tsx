@@ -4,12 +4,21 @@ import FooterSide from "../components/Footer";
 
 const LayoutHandling = () => {
     const location = useLocation();
+    // Check if the current path is the dashboard route.
     const isDashboardPage = location.pathname === '/dashboard';
 
     return (
         <div>
-            <NavbarPage />
+            {/* 
+              This will now only render the public navbar if the user is NOT on the dashboard page.
+            */}
+            {!isDashboardPage && <NavbarPage />}
+            
             <Outlet />
+            
+            {/* 
+              This will now only render the public footer if the user is NOT on the dashboard page.
+            */}
             {!isDashboardPage && <FooterSide />}
         </div>
     );
